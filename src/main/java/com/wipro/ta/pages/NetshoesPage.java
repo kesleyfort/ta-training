@@ -28,4 +28,13 @@ public class NetshoesPage {
     public WebElement buyNowButton;
     @FindBy(className = "summary__item-value")
     public WebElement shippingValue;
+    @FindBy(xpath = "//i[@qa-auto='product-btn-remove']")
+    public WebElement removeProductButton;
+    public String removeProductButtonXpath = "//i[@qa-auto='product-btn-remove']";
+    @FindBy(xpath = "//h1[@class='empty-page__title' and contains(text(),'Seu carrinho está vazio')]")
+    public WebElement emptyCartHeader;
+    @FindBy(xpath = "//button[@qa-auto='cart-add-qty']")
+    public WebElement cartIncreaseQuantity;
+    @FindBy(xpath = "//input[@qa-auto='cart-product-qty']")
+    public WebElement cartProductQuantity;
 }

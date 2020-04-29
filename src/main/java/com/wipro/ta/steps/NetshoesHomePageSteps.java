@@ -12,9 +12,12 @@ import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
+import org.hamcrest.*;
 import java.util.List;
 import java.util.Random;
+
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 
 @Component
 public class NetshoesHomePageSteps extends AbstractSteps {
@@ -23,7 +26,7 @@ public class NetshoesHomePageSteps extends AbstractSteps {
     NetshoesPage netshoesPage;
     @Value("${home.url}")
     private String NETSHOES_HOMEPAGE_URL;
-
+    private int initialQuantity;
     protected Logger LOG = Logger.getLogger(this.getClass());
     final
     Utils utils;
@@ -115,4 +118,41 @@ public class NetshoesHomePageSteps extends AbstractSteps {
         Assert.assertEquals("Error message was expected to be displayed, but it was not", "Produto indisponível", netshoesPage.unavailableProductMessage.getText());
     }
 
+    @When("I click the remove product button")
+    public void iClickTheRemoveProductButton() {
+        utils.hardWaitForElement(By.xpath(netshoesPage.removeProductButtonXpath));
+        netshoesPage.removeProductButton.click();
+    }
+
+    @Then("I should see the cart is empty message")
+    public void iShouldSeeTheCartIsEmptyMessage(){
+        Assert.assertTrue(netshoesPage.emptyCartHeader.isDisplayed());
+    }
+
+    @When ("I click the add quantity button")
+    public void iClickTheAddQuantityButton(){
+        utils.hardWaitForElement(By.xpath("//button[@qa-auto='cart-add-qty']"));
+        initialQuantity = Integer.parseInt(netshoesPage.cartProductQuantity.getText());
+        LOG.debug("Quantity is " + initialQuantity);
+        netshoesPage.cartIncreaseQuantity.click();
+    }
+    @Then ("I should see the product quantity has $modifier")
+    public void seeProductQuantity(@Value("modifier") String modifier){
+        int updatedQuantity;
+        switch (modifier) {
+            case "increased" : {
+                updatedQuantity = Integer.parseInt(netshoesPage.cartProductQuantity.getText());
+                LOG.debug("Quantity is " + updatedQuantity);
+                Assert.assertThat(updatedQuantity, greaterThan(initialQuantity));
+                break;
+            }
+            case "decreased" : {
+                updatedQuantity = Integer.parseInt(netshoesPage.cartProductQuantity.getText());
+                LOG.debug("Quantity is " + updatedQuantity);
+                Assert.assertThat(updatedQuantity, lessThan(initialQuantity));
+                break;
+            }
+        }
+
+    }
 }
